@@ -1,0 +1,180 @@
+<!DOCTYPE HTML><html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <style>
+    label {
+    display: block;
+    font: 1rem 'Fira Sans', sans-serif;
+    }
+
+    input,
+    label {
+      margin: 100rem 0;
+    }
+
+    /*
+    h3 {
+      font-family: Arial;
+      font-size: 2.5rem;
+      text-align: center;
+    }
+    */
+    body {
+      min-width: 0px;
+    	max-width: 500px;
+    	height: 400px;
+    }
+    h3 {
+      font-family: Arial;
+      font-size: 2.5rem;
+      text-align: right;
+    }
+
+    #left {
+      text-align: right;
+      font-family: Arial;
+      font-size: 2.5rem;
+      position: relative;
+    }
+    #names{
+      top: 0px; 
+      left: 0px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div style="  background-color: #a096f8; color: Black" id = "left" > ESP Vibration</div>
+  <div style="  top: 0px;   left: 0px"       id="chart-temperature" class="container"></div>
+  <div style="  top: 300px; left: 0px;"      id="chart-vibration"   class="container"></div>
+  <div style="  top: 600px; left: 0px;"      id="chart-charge"      class="container"></div> 
+  <h3 style="font-size: 1rem;">LAST TIME RECEIVED DATA FROM ESP32 ['datetime (dd-mm-yyyy)] <span id="ESP32_01_LTRD"></span> ]</h3>
+<button onclick="window.open('recordtable.php', '_blank');">Open Record Table</button>
+</body>
+<script>
+var chartT = new Highcharts.Chart({
+  chart:{ renderTo : 'chart-temperature' },
+  title: { text: 'MPU6050 Temperature' },
+  series: [{
+    showInLegend: false,
+    data: []
+  }],
+
+  plotOptions: {
+    line: { animation: false,
+      dataLabels: { enabled: true }
+    },
+    series: { color: '#059e8a' }
+  },
+  xAxis: { type: 'datetime',
+    dateTimeLabelFormats: { second: '%H:%M:%S' }
+  },
+  yAxis: {
+    title: { text: 'Temperature (Celsius)' }
+    //title: { text: 'Temperature (Fahrenheit)' }
+  },
+  credits: { enabled: false }
+});
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var x = (new Date()).getTime(),
+          y = parseFloat(this.responseText);
+      //console.log(this.responseText);
+      if(chartT.series[0].data.length > 40) {
+        chartT.series[0].addPoint([x, y], true, true, true);
+      } else {
+        chartT.series[0].addPoint([x, y], true, false, true);
+      }
+    }
+  };
+  xhttp.open("GET", "/temperature", true);
+  xhttp.send();
+}, 1000 ) ;
+
+var chartH = new Highcharts.Chart({
+  chart:{ renderTo:'chart-vibration' },
+  title: { text: 'MPU6050 Vibration' },
+  series: [{
+    showInLegend: false,
+    data: []
+  }],
+  plotOptions: {
+    line: { animation: false,
+      dataLabels: { enabled: true }
+    }
+  },
+  xAxis: {
+    type: 'datetime',
+    dateTimeLabelFormats: { second: '%H:%M:%S' }
+  },
+  yAxis: {
+    title: { text: 'Vibration (Hz)' }
+  },
+  credits: { enabled: false }
+});
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var x = (new Date()).getTime(),
+          y = parseFloat(this.responseText);
+      //console.log(this.responseText);
+      if(chartH.series[0].data.length > 40) {
+        chartH.series[0].addPoint([x, y], true, true, true);
+      } else {
+        chartH.series[0].addPoint([x, y], true, false, true);
+      }
+    }
+  };
+  xhttp.open("GET", "/vibration", true);
+  xhttp.send();
+}, 1000 );
+
+var chartСH = new Highcharts.Chart({
+  chart:{ renderTo : 'chart-charge' },
+  title: { text: 'Charge' },
+
+  
+  series: [{
+    showInLegend: false,
+    data: []
+  }],
+
+  plotOptions: {
+    line: { animation: false,
+      dataLabels: { enabled: true }
+    },
+    series: { color: '#059e8a' }
+  },
+  xAxis: { type: 'datetime',
+    dateTimeLabelFormats: { second: '%H:%M:%S' }
+  },
+  yAxis: {
+    title: { text: 'Volt (V)' }
+    //title: { text: 'Temperature (Fahrenheit)' }
+  },
+  credits: { enabled: false }
+});
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var x = (new Date()).getTime(),
+          y = parseFloat(this.responseText);
+      //console.log(this.responseText);
+      if(chartСH.series[0].data.length > 40) {
+        chartСH.series[0].addPoint([x, y], true, true, true);
+      } else {
+        chartСH.series[0].addPoint([x, y], true, false, true);
+      }
+    }
+  };
+  xhttp.open("GET", "/charge", true);
+  xhttp.send();
+}, 1000 ) ;
+</script>
+</html>
